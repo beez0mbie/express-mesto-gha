@@ -1,10 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const router = require('./routes/users');
+const router = require('./routes');
 require('dotenv').config();
 
-const { PORT, MONGODB_URL } = process.env;
+const { PORT, MONGODB_URL, USER_ID } = process.env;
 
 mongoose
   .connect(MONGODB_URL, {
@@ -20,8 +20,14 @@ mongoose
 const app = express();
 
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  req.user = {
+    _id: USER_ID, // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
 
-app.use('/', router);
+  next();
+});
+app.use(router);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
