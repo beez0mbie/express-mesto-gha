@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const router = require('./routes');
 require('dotenv').config();
 
-const { PORT, MONGODB_URL, USER_ID } = process.env;
+const { PORT, USER_ID } = process.env;
+const MONGODB_URL = 'mongodb://localhost:27017/mestodb';
 
 mongoose
   .connect(MONGODB_URL, {
