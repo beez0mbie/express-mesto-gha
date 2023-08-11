@@ -1,5 +1,5 @@
 const UserModel = require('../models/user');
-const { handle500Error, handleErrors } = require('../utils/errors');
+const { handleErrors } = require('../utils/errors');
 
 const getUsers = (req, res) => UserModel.find({})
   .then((users) => res.status(200).send(users))
