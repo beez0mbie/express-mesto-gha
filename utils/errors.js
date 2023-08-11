@@ -1,4 +1,6 @@
-const handleCreateDbErrors = (err, res) => {
+const handle500Error = (err, res) => res.status(500).send({ message: `Server Error ${err.message}` });
+
+const handleErrors = (err, res) => {
   if (err.name === 'ValidationError') {
     return res.status(400).send({
       message: `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
@@ -9,7 +11,7 @@ const handleCreateDbErrors = (err, res) => {
       message: `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
     });
   }
-  return res.status(500).send('Server Error');
+  return handle500Error(err, res);
 };
 
-module.exports = handleCreateDbErrors;
+module.exports = { handle500Error, handleErrors };

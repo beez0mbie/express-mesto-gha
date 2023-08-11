@@ -1,5 +1,5 @@
 const CardModel = require('../models/card');
-const handleCreateDbErrors = require('../utils/errors');
+const { handleErrors } = require('../utils/errors');
 
 const getCards = (req, res) => CardModel.find({})
   .then((cards) => res.status(200).send(cards))
@@ -10,10 +10,7 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
   CardModel.create({ name, link, owner })
     .then((card) => res.status(200).send(card))
-    .catch((err) => {
-      console.log(err);
-      handleCreateDbErrors(err, res);
-    });
+    .catch((err) => handleErrors(err, res));
 };
 
 const deleteCard = (req, res) => {
@@ -24,7 +21,7 @@ const deleteCard = (req, res) => {
     }
     return res.status(200).send(card);
   })
-    .catch((err) => res.status(500).send(`Server Error ${err.message}`));
+    .catch((err) => handleErrors(err, res));
 };
 
 const likeCard = (req, res) => {
@@ -33,13 +30,16 @@ const likeCard = (req, res) => {
   CardModel.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: userId } },
-    { new: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   ).then((card) => {
     if (!card) {
       return res.status(404).send({ message: 'Card not found' });
     }
     return res.status(200).send(card);
-  }).catch((err) => res.status(500).send(`Server Error ${err.message}`));
+  }).catch((err) => handleErrors(err, res));
 };
 
 const dislikeCard = (req, res) => {
@@ -48,13 +48,16 @@ const dislikeCard = (req, res) => {
   CardModel.findByIdAndUpdate(
     cardId,
     { $pull: { likes: userId } },
-    { new: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   ).then((card) => {
     if (!card) {
       return res.status(404).send({ message: 'Card not found' });
     }
     return res.status(200).send(card);
-  }).catch((err) => res.status(500).send(`Server Error ${err.message}`));
+  }).catch((err) => handleErrors(err, res));
 };
 
 module.exports = {
