@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const router = require('./routes');
 require('dotenv').config();
 
-const { PORT, USER_ID } = process.env;
+const { PORT } = process.env;
 const MONGODB_URL = 'mongodb://localhost:27017/mestodb';
 
 mongoose
@@ -23,7 +23,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   req.user = {
-    _id: USER_ID, // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: '64d238466b090919cc7f2cf9', // вставьте сюда _id созданного в предыдущем пункте пользователя
   };
 
   next();
