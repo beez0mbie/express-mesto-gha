@@ -27,8 +27,40 @@ const deleteCard = (req, res) => {
     .catch((err) => res.status(500).send(`Server Error ${err.message}`));
 };
 
+const likeCard = (req, res) => {
+  const { cardId } = req.params;
+  const userId = req.user._id;
+  CardModel.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: userId } },
+    { new: true },
+  ).then((card) => {
+    if (!card) {
+      return res.status(404).send({ message: 'Card not found' });
+    }
+    return res.status(200).send(card);
+  }).catch((err) => res.status(500).send(`Server Error ${err.message}`));
+};
+
+const dislikeCard = (req, res) => {
+  const { cardId } = req.params;
+  const userId = req.user._id;
+  CardModel.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: userId } },
+    { new: true },
+  ).then((card) => {
+    if (!card) {
+      return res.status(404).send({ message: 'Card not found' });
+    }
+    return res.status(200).send(card);
+  }).catch((err) => res.status(500).send(`Server Error ${err.message}`));
+};
+
 module.exports = {
   getCards,
   createCard,
   deleteCard,
+  likeCard,
+  dislikeCard,
 };

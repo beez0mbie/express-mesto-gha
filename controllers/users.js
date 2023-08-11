@@ -42,13 +42,16 @@ const updateUser = async (req, res) => {
 
 const updateUserAvatar = (req, res) => {
   const userId = req.user._id;
-  UserModel.findByIdAndUpdate(userId, { avatar: req.body.avatar }, { new: true })
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-      }
-      return res.status(200).send(user);
-    })
+  UserModel.findByIdAndUpdate(
+    userId,
+    { avatar: req.body.avatar },
+    { new: true },
+  ).then((user) => {
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+    return res.status(200).send(user);
+  })
     .catch((err) => res.status(500).send(`Server Error ${err.message}`));
 };
 
