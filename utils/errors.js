@@ -1,3 +1,6 @@
+const InvalidCardIdError = require('../errors/invalidCardId');
+const InvalidUserIdError = require('../errors/invalidUserId');
+
 const handle500Error = (err, res) => res.status(500).send({ message: `Server Error ${err.message}` });
 
 const handleErrors = (err, res) => {
@@ -6,6 +9,12 @@ const handleErrors = (err, res) => {
     return res.status(400).send({
       message,
     });
+  }
+  if (err instanceof InvalidCardIdError) {
+    return res.status(err.statusCode).send(err.message);
+  }
+  if (err instanceof InvalidUserIdError) {
+    return res.status(err.statusCode).send(err.message);
   }
   return handle500Error(err, res);
 };

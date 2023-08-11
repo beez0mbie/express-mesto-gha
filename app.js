@@ -1,11 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const router = require('./routes');
 require('dotenv').config();
 
-const { PORT } = process.env;
-const MONGODB_URL = 'mongodb://localhost:27017/mestodb';
+const {
+  PORT = 3000,
+  MONGODB_URL = 'mongodb://localhost:27017/mestodb',
+} = process.env;
 
 mongoose
   .connect(MONGODB_URL, {
@@ -20,6 +23,7 @@ mongoose
 
 const app = express();
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   req.user = {
@@ -29,10 +33,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(router);
-
-app.use((req, res) => {
-  res.status(404).send({ message: 'Page not found' });
-});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

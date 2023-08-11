@@ -1,18 +1,16 @@
 const UserModel = require('../models/user');
 const { handleErrors } = require('../utils/errors');
+const InvalidUserIdError = require('../errors/invalidUserId');
 
 const getUsers = (req, res) => UserModel.find({})
-  .then((users) => res.status(200).send(users))
+  .then((users) => res.send(users))
   .catch((err) => res.status(500).send(`Server Error ${err.message}`));
 
 const getUserById = (req, res) => {
   const { userId } = req.params;
-  return UserModel.findById(userId).then((user) => {
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    return res.status(200).send(user);
-  })
+  UserModel.findById(userId)
+    .orFail(new InvalidUserIdError())
+    .then((user) => res.send(user))
     .catch((err) => handleErrors(err, res));
 };
 
@@ -30,11 +28,8 @@ const updateUser = async (req, res) => {
         new: true,
         runValidators: true,
       },
-    );
-    if (!updatedUser) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    return res.status(200).send(updatedUser);
+    ).orFail(new InvalidUserIdError());
+    return res.send(updatedUser);
   } catch (err) {
     return handleErrors(err, res);
   }
@@ -49,12 +44,8 @@ const updateUserAvatar = (req, res) => {
       new: true,
       runValidators: true,
     },
-  ).then((user) => {
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    return res.status(200).send(user);
-  })
+  ).orFail(new InvalidUserIdError())
+    .then((user) => res.send(user))
     .catch((err) => handleErrors(err, res));
 };
 
