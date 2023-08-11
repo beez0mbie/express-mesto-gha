@@ -19,4 +19,4 @@ const handleErrors = (err, res) => {
   return handle500Error(err, res);
 };
 
-module.exports = { handle500Error, handleErrors };
+module.exports = { handleErrors };
