@@ -1,7 +1,33 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user');
 const { handleErrors } = require('../utils/errors');
 const InvalidUserIdError = require('../errors/invalidUserId');
+const InvalidEmailOrPassword = require('../errors/invalidEmailOrPassword');
+require('dotenv').config();
+
+const { NODE_ENV, JWT_SECRET } = process.env;
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+  UserModel.findOne({ email })
+    .orFail(new InvalidEmailOrPassword())
+    .then((user) => bcrypt.compare(password, user.password)
+      .then((matched) => {
+        if (!matched) {
+          throw new InvalidEmailOrPassword();
+        }
+        const token = jwt.sign(
+          { _id: user._id },
+          NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
+        );
+        res.cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 365,
+          httpOnly: true,
+        }).send({ message: 'Всё верно! JWT отправлен' });
+      }))
+    .catch((err) => handleErrors(err, res));
+};
 
 const getUsers = (req, res) => UserModel.find({})
   .then((users) => res.send(users))
@@ -54,6 +80,7 @@ const updateUserAvatar = (req, res) => {
 };
 
 module.exports = {
+  login,
   getUsers,
   getUserById,
   createUser,

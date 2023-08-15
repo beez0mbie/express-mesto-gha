@@ -1,4 +1,6 @@
-class InvalidUserIdError extends Error {
+const CustomError = require('./customError');
+
+class InvalidUserIdError extends CustomError {
   constructor(message) {
     super(message);
     this.name = 'InvalidUserIdError';

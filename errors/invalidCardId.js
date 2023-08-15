@@ -1,4 +1,6 @@
-class InvalidCardIdError extends Error {
+const CustomError = require('./customError');
+
+class InvalidCardIdError extends CustomError {
   constructor(message) {
     super(message);
     this.name = 'InvalidCardIdError';

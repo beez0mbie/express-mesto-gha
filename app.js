@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const router = require('./routes');
+const { login, createUser } = require('./controllers/users');
 require('dotenv').config();
 
 const {
@@ -25,13 +26,9 @@ const app = express();
 
 app.use(helmet());
 app.use(bodyParser.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64d238466b090919cc7f2cf9', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
 
-  next();
-});
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use(router);
 
 app.listen(PORT, () => {

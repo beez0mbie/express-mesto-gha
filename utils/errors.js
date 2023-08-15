@@ -1,7 +1,6 @@
-const InvalidCardIdError = require('../errors/invalidCardId');
-const InvalidUserIdError = require('../errors/invalidUserId');
+const CustomError = require('../errors/customError');
 
-const handle500Error = (err, res) => res.status(500).send({ message: `Server Error ${err.message}` });
+const defaultServerError = (err, res) => res.status(500).send({ message: `Server Error ${err.message}` });
 
 const handleErrors = (err, res) => {
   if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -10,13 +9,10 @@ const handleErrors = (err, res) => {
       message,
     });
   }
-  if (err instanceof InvalidCardIdError) {
+  if (err instanceof CustomError) {
     return res.status(err.statusCode).send(err.message);
   }
-  if (err instanceof InvalidUserIdError) {
-    return res.status(err.statusCode).send(err.message);
-  }
-  return handle500Error(err, res);
+  return defaultServerError(err, res);
 };
 
 module.exports = { handleErrors };
