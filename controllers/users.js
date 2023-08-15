@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const UserModel = require('../models/user');
 const { handleErrors } = require('../utils/errors');
 const InvalidUserIdError = require('../errors/invalidUserId');
@@ -14,9 +15,12 @@ const getUserById = (req, res) => {
     .catch((err) => handleErrors(err, res));
 };
 
-const createUser = (req, res) => UserModel.create({ ...req.body })
-  .then((user) => res.status(201).send(user))
-  .catch((err) => handleErrors(err, res));
+const createUser = (req, res) => {
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => UserModel.create({ ...req.body, password: hash }))
+    .then((user) => res.status(201).send(user))
+    .catch((err) => handleErrors(err, res));
+};
 
 const updateUser = async (req, res) => {
   const userId = req.user._id;
