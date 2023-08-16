@@ -1,10 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
-require('dotenv').config();
+const auth = require('./middlewares/auth');
 
 const {
   PORT = 3000,
@@ -29,6 +30,7 @@ app.use(bodyParser.json());
 
 app.post('/signin', login);
 app.post('/signup', createUser);
+app.use(auth);
 app.use(router);
 
 app.listen(PORT, () => {

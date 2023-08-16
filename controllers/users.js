@@ -4,9 +4,7 @@ const UserModel = require('../models/user');
 const { handleErrors } = require('../utils/errors');
 const InvalidUserIdError = require('../errors/invalidUserId');
 const InvalidEmailOrPassword = require('../errors/invalidEmailOrPassword');
-require('dotenv').config();
-
-const { NODE_ENV, JWT_SECRET } = process.env;
+const getJwtSecretKey = require('../utils/getJwtSecretKey');
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -19,7 +17,7 @@ const login = (req, res) => {
         }
         const token = jwt.sign(
           { _id: user._id },
-          NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
+          getJwtSecretKey(),
         );
         res.cookie('jwt', token, {
           maxAge: 3600000 * 24 * 365,
@@ -32,6 +30,14 @@ const login = (req, res) => {
 const getUsers = (req, res) => UserModel.find({})
   .then((users) => res.send(users))
   .catch((err) => res.status(500).send(`Server Error ${err.message}`));
+
+const getUser = (req, res) => {
+  const userId = req.user._id;
+  UserModel.findById(userId)
+    .orFail(new InvalidUserIdError())
+    .then((user) => res.send(user))
+    .catch((err) => handleErrors(err, res));
+};
 
 const getUserById = (req, res) => {
   const { userId } = req.params;
@@ -82,6 +88,7 @@ const updateUserAvatar = (req, res) => {
 module.exports = {
   login,
   getUsers,
+  getUser,
   getUserById,
   createUser,
   updateUser,
