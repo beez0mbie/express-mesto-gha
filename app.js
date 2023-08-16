@@ -28,8 +28,8 @@ const app = express();
 app.use(helmet());
 app.use(bodyParser.json());
 
-app.post('/signin', login);
 app.post('/signup', createUser);
+app.post('/signin', login);
 app.use(auth);
 app.use(router);
 

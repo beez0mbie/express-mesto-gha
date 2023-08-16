@@ -1,6 +1,7 @@
 const CardModel = require('../models/card');
 const { handleErrors } = require('../utils/errors');
 const InvalidCardIdError = require('../errors/invalidCardId');
+const AuthenticationError = require('../errors/authenticationError');
 
 const getCards = (req, res) => CardModel.find({})
   .then((cards) => res.send(cards))
@@ -16,8 +17,15 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  CardModel.findByIdAndRemove(cardId)
+  const userId = req.user._id;
+  CardModel.findById(cardId)
     .orFail(new InvalidCardIdError())
+    .then((card) => {
+      if (card.owner.toString() !== userId) {
+        throw new AuthenticationError();
+      }
+      return CardModel.findByIdAndRemove(cardId);
+    })
     .then((card) => res.send(card))
     .catch((err) => handleErrors(err, res));
 };
