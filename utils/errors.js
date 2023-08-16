@@ -12,7 +12,10 @@ const handleErrors = (err, res) => {
   if (err instanceof CustomError) {
     return res.status(err.statusCode).send(err.message);
   }
+  if (err.code === 11000) {
+    return res.status(409).send({ message: 'MongoServerError: E11000 duplicate key error collection' });
+  }
   return defaultServerError(err, res);
 };
 
-module.exports = { handleErrors };
+module.exports = handleErrors;

@@ -1,21 +1,20 @@
 const CardModel = require('../models/card');
-const { handleErrors } = require('../utils/errors');
 const InvalidCardIdError = require('../errors/invalidCardId');
 const AuthenticationError = require('../errors/authenticationError');
 
-const getCards = (req, res) => CardModel.find({})
+const getCards = (req, res, next) => CardModel.find({})
   .then((cards) => res.send(cards))
-  .catch((err) => handleErrors(err, res));
+  .catch(next);
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const owner = req.user._id;
   const { name, link } = req.body;
   CardModel.create({ name, link, owner })
     .then((card) => res.status(201).send(card))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   CardModel.findById(cardId)
@@ -27,10 +26,10 @@ const deleteCard = (req, res) => {
       return CardModel.findByIdAndRemove(cardId);
     })
     .then((card) => res.send(card))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   CardModel.findByIdAndUpdate(
@@ -42,10 +41,10 @@ const likeCard = (req, res) => {
     },
   ).orFail(new InvalidCardIdError())
     .then((card) => res.send(card))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   CardModel.findByIdAndUpdate(
@@ -57,7 +56,7 @@ const dislikeCard = (req, res) => {
     },
   ).orFail(new InvalidCardIdError())
     .then((card) => res.send(card))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
 module.exports = {

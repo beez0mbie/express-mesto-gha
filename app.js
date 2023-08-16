@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const handleErrors = require('./utils/errors');
 
 const {
   PORT = 3000,
@@ -32,7 +33,10 @@ app.post('/signup', createUser);
 app.post('/signin', login);
 app.use(auth);
 app.use(router);
-
+// eslint-disable-next-line no-unused-vars, max-len
+app.use((err, _req, res, _next) => { // _next обязательно нужно указать 4 параметр что бы ошибки заработали
+  handleErrors(err, res);
+});
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });

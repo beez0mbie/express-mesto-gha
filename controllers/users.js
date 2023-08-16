@@ -1,14 +1,14 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user');
-const { handleErrors } = require('../utils/errors');
 const InvalidUserIdError = require('../errors/invalidUserId');
 const InvalidEmailOrPassword = require('../errors/invalidEmailOrPassword');
 const getJwtSecretKey = require('../utils/getJwtSecretKey');
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   UserModel.findOne({ email })
+    .select('+password')
     .orFail(new InvalidEmailOrPassword())
     .then((user) => bcrypt.compare(password, user.password)
       .then((matched) => {
@@ -24,37 +24,37 @@ const login = (req, res) => {
           httpOnly: true,
         }).send({ message: 'Всё верно! JWT отправлен' });
       }))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const getUsers = (req, res) => UserModel.find({})
+const getUsers = (req, res, next) => UserModel.find({})
   .then((users) => res.send(users))
-  .catch((err) => res.status(500).send(`Server Error ${err.message}`));
+  .catch(next);
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const userId = req.user._id;
   UserModel.findById(userId)
     .orFail(new InvalidUserIdError())
     .then((user) => res.send(user))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   const { userId } = req.params;
   UserModel.findById(userId)
     .orFail(new InvalidUserIdError())
     .then((user) => res.send(user))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => UserModel.create({ ...req.body, password: hash }))
     .then((user) => res.status(201).send(user))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   const userId = req.user._id;
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -65,13 +65,13 @@ const updateUser = async (req, res) => {
         runValidators: true,
       },
     ).orFail(new InvalidUserIdError());
-    return res.send(updatedUser);
+    res.send(updatedUser);
   } catch (err) {
-    return handleErrors(err, res);
+    next(err);
   }
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   const userId = req.user._id;
   UserModel.findByIdAndUpdate(
     userId,
@@ -82,7 +82,7 @@ const updateUserAvatar = (req, res) => {
     },
   ).orFail(new InvalidUserIdError())
     .then((user) => res.send(user))
-    .catch((err) => handleErrors(err, res));
+    .catch(next);
 };
 
 module.exports = {
