@@ -50,7 +50,11 @@ const getUserById = (req, res, next) => {
 const createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => UserModel.create({ ...req.body, password: hash }))
-    .then((user) => res.status(201).send(user))
+    .then((user) => {
+      const userResponse = user.toObject();
+      delete userResponse.password;
+      res.status(201).send(userResponse);
+    })
     .catch(next);
 };
 
