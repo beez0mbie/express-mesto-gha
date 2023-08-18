@@ -10,7 +10,7 @@ const {
 
 const userIdKey = {
   params: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    userId: Joi.string().length(24),
   }),
 };
 
