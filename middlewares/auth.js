@@ -3,16 +3,10 @@ const AuthError = require('../errors/authError');
 const getJwtSecretKey = require('../utils/getJwtSecretKey');
 
 const auth = (req, res, next) => {
-  const { authorization } = req.headers;
-  const authorizationMethod = 'Bearer ';
-  if (!authorization || !authorization.startsWith(authorizationMethod)) {
-    next(new AuthError());
-  }
-
   let payload;
 
   try {
-    const token = authorization.replace(authorizationMethod, '');
+    const token = req.cookies.jwt;
     payload = jwt.verify(token, getJwtSecretKey());
   } catch (err) {
     next(new AuthError());
