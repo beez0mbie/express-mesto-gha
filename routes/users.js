@@ -8,11 +8,10 @@ const {
   getUser,
 } = require('../controllers/users');
 const urlRegExp = require('../utils/urlRegExp');
-const NotFoundError = require('../errors/notFound');
 
 const userIdKey = {
   params: Joi.object().keys({
-    userId: Joi.string().length(24).error(new NotFoundError()),
+    userId: Joi.string().length(24),
   }),
 };
 
