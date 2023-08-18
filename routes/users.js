@@ -7,17 +7,28 @@ const {
   updateUserAvatar,
   getUser,
 } = require('../controllers/users');
+const urlRegExp = require('../utils/urlRegExp');
+const NotFoundError = require('../errors/notFound');
 
 const userIdKey = {
   params: Joi.object().keys({
-    userId: Joi.string().length(24),
+    userId: Joi.string().length(24).error(new NotFoundError()),
   }),
 };
 
 router.get('/', getUsers);
 router.get('/me', getUser);
-router.patch('/me', updateUser);
-router.patch('/me/avatar', updateUserAvatar);
+router.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateUser);
+router.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().pattern(urlRegExp),
+  }),
+}), updateUserAvatar);
 // роуты с параметрами лучше указывать после конкретных роутов,
 // иначе мы идем по роуту и экпресс воспринимает его как параметр
 router.get('/:userId', celebrate(userIdKey), getUserById);
