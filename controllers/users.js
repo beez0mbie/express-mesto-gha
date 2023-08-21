@@ -66,7 +66,6 @@ const updateUser = async (req, res, next) => {
       { name: req.body.name, about: req.body.about },
       {
         new: true,
-        runValidators: true,
       },
     ).orFail(new NotFoundError('Пользователя с таким ID не существует в базе'));
     res.send(updatedUser);
@@ -82,7 +81,6 @@ const updateUserAvatar = (req, res, next) => {
     { avatar: req.body.avatar },
     {
       new: true,
-      runValidators: true,
     },
   ).orFail(new NotFoundError('Пользователя с таким ID не существует в базе'))
     .then((user) => res.send(user))

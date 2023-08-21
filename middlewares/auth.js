@@ -10,6 +10,7 @@ const auth = (req, res, next) => {
     payload = jwt.verify(token, getJwtSecretKey());
   } catch (err) {
     next(new AuthorizationError('Необходима авторизация'));
+    return;
   }
 
   req.user = payload;

@@ -23,7 +23,6 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== userId) {
         throw new AuthenticationError('Нет прав удалить данную карточку');
       }
-      // return CardModel.findByIdAndRemove(cardId);
       return CardModel.deleteOne({ _id: cardId });
     })
     .then((card) => res.send(card))
@@ -38,7 +37,6 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: userId } },
     {
       new: true,
-      runValidators: true,
     },
   ).orFail(new NotFoundError('Карточки с таким ID не существует в базе'))
     .then((card) => res.send(card))
@@ -53,7 +51,6 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: userId } },
     {
       new: true,
-      runValidators: true,
     },
   ).orFail(new NotFoundError('Карточки с таким ID не существует в базе'))
     .then((card) => res.send(card))
