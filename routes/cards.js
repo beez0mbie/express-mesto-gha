@@ -11,7 +11,7 @@ const urlRegExp = require('../utils/urlRegExp');
 
 const cardIdKey = {
   params: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 };
 
