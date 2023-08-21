@@ -4,7 +4,7 @@ class AuthenticationError extends CustomError {
   constructor(message) {
     super(message);
     this.name = 'authenticationError';
-    this.message = { message: 'Нет прав удалить данную карточку' };
+    this.message = { message };
     this.statusCode = 403;
   }
 }

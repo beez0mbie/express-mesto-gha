@@ -1,19 +1,19 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/user');
-const InvalidUserIdError = require('../errors/invalidUserId');
-const InvalidEmailOrPassword = require('../errors/invalidEmailOrPassword');
+const NotFoundError = require('../errors/notFound');
+const AuthorizationError = require('../errors/authorizationError');
 const getJwtSecretKey = require('../utils/getJwtSecretKey');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   UserModel.findOne({ email })
     .select('+password')
-    .orFail(new InvalidEmailOrPassword())
+    .orFail(new AuthorizationError('Неправильные почта или пароль'))
     .then((user) => bcrypt.compare(password, user.password)
       .then((matched) => {
         if (!matched) {
-          throw new InvalidEmailOrPassword();
+          throw new AuthorizationError('Неправильные почта или пароль');
         }
         const token = jwt.sign(
           { _id: user._id },
@@ -34,7 +34,7 @@ const getUsers = (req, res, next) => UserModel.find({})
 const getUser = (req, res, next) => {
   const userId = req.user._id;
   UserModel.findById(userId)
-    .orFail(new InvalidUserIdError())
+    .orFail(new NotFoundError('Пользователя с таким ID не существует в базе'))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -42,7 +42,7 @@ const getUser = (req, res, next) => {
 const getUserById = (req, res, next) => {
   const { userId } = req.params;
   UserModel.findById(userId)
-    .orFail(new InvalidUserIdError())
+    .orFail(new NotFoundError('Пользователя с таким ID не существует в базе'))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -68,7 +68,7 @@ const updateUser = async (req, res, next) => {
         new: true,
         runValidators: true,
       },
-    ).orFail(new InvalidUserIdError());
+    ).orFail(new NotFoundError('Пользователя с таким ID не существует в базе'));
     res.send(updatedUser);
   } catch (err) {
     next(err);
@@ -84,7 +84,7 @@ const updateUserAvatar = (req, res, next) => {
       new: true,
       runValidators: true,
     },
-  ).orFail(new InvalidUserIdError())
+  ).orFail(new NotFoundError('Пользователя с таким ID не существует в базе'))
     .then((user) => res.send(user))
     .catch(next);
 };

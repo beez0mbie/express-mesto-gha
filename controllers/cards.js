@@ -1,5 +1,5 @@
 const CardModel = require('../models/card');
-const InvalidCardIdError = require('../errors/invalidCardId');
+const NotFoundError = require('../errors/notFound');
 const AuthenticationError = require('../errors/authenticationError');
 
 const getCards = (req, res, next) => CardModel.find({})
@@ -18,10 +18,10 @@ const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   CardModel.findById(cardId)
-    .orFail(new InvalidCardIdError())
+    .orFail(new NotFoundError('Карточки с таким ID не существует в базе'))
     .then((card) => {
       if (card.owner.toString() !== userId) {
-        throw new AuthenticationError();
+        throw new AuthenticationError('Нет прав удалить данную карточку');
       }
       return CardModel.findByIdAndRemove(cardId);
     })
@@ -39,7 +39,7 @@ const likeCard = (req, res, next) => {
       new: true,
       runValidators: true,
     },
-  ).orFail(new InvalidCardIdError())
+  ).orFail(new NotFoundError('Карточки с таким ID не существует в базе'))
     .then((card) => res.send(card))
     .catch(next);
 };
@@ -54,7 +54,7 @@ const dislikeCard = (req, res, next) => {
       new: true,
       runValidators: true,
     },
-  ).orFail(new InvalidCardIdError())
+  ).orFail(new NotFoundError('Карточки с таким ID не существует в базе'))
     .then((card) => res.send(card))
     .catch(next);
 };
