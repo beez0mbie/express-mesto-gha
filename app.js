@@ -10,11 +10,7 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const handleErrors = require('./utils/errors');
 const urlRegExp = require('./utils/urlRegExp');
-
-const {
-  PORT = 3000,
-  MONGODB_URL = 'mongodb://localhost:27017/mestodb',
-} = process.env;
+const { PORT, MONGODB_URL } = require('./env');
 
 mongoose
   .connect(MONGODB_URL, {
