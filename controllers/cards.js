@@ -23,7 +23,8 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== userId) {
         throw new AuthenticationError('Нет прав удалить данную карточку');
       }
-      return CardModel.findByIdAndRemove(cardId);
+      // return CardModel.findByIdAndRemove(cardId);
+      return CardModel.deleteOne({ _id: cardId });
     })
     .then((card) => res.send(card))
     .catch(next);
