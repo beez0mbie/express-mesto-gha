@@ -26,3 +26,6 @@ yarn-error.log*
 # Optional REPL history
 .idea
 .vscode
+
+# env
+.env
