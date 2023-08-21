@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-const { celebrate, Joi, errors } = require('celebrate');
+const { celebrate, errors } = require('celebrate');
 const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const handleErrors = require('./utils/errors');
-const urlRegExp = require('./utils/urlRegExp');
+const { signUp, signIn } = require('./utils/routerValidations');
 const { PORT, MONGODB_URL } = require('./env');
 
 mongoose
@@ -30,27 +30,14 @@ app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(urlRegExp),
-  }),
-}), createUser);
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-
-  }),
-}), login);
+app.post('/signup', celebrate(signUp), createUser);
+app.post('/signin', celebrate(signIn), login);
 app.use(auth);
 app.use(router);
 app.use(errors());
 // eslint-disable-next-line no-unused-vars, max-len
-app.use((err, _req, res, _next) => { // _next обязательно нужно указать 4 параметр что бы ошибки заработали
+app.use((err, _req, res, _next) => {
+  // _next обязательно нужно указать 4 параметр что бы ошибки заработали
   handleErrors(err, res);
 });
 app.listen(PORT, () => {
