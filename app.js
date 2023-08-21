@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { celebrate, Joi, errors } = require('celebrate');
@@ -30,7 +29,7 @@ mongoose
 const app = express();
 
 app.use(helmet());
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 
 app.post('/signup', celebrate({
