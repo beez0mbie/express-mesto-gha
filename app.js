@@ -10,6 +10,8 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const handleErrors = require('./utils/errors');
 const { signUp, signIn } = require('./utils/routerValidations');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const { PORT, MONGODB_URL } = require('./env');
 
 mongoose
@@ -29,11 +31,14 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.post('/signup', celebrate(signUp), createUser);
 app.post('/signin', celebrate(signIn), login);
 app.use(auth);
 app.use(router);
+
+app.use(errorLogger);
 app.use(errors());
 // eslint-disable-next-line no-unused-vars, max-len
 app.use((err, _req, res, _next) => {
