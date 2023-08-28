@@ -6,13 +6,19 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { celebrate, errors } = require('celebrate');
 const router = require('./routes');
-const { login, createUser } = require('./controllers/users');
+const { login, logout, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const handleErrors = require('./utils/errors');
 const { signUp, signIn } = require('./utils/routerValidations');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT, MONGODB_URL } = require('./env');
+
+const allowedCors = [
+  'localhost:3000',
+  'localhost:3001',
+  'http://localhost:3001',
+];
 
 mongoose
   .connect(MONGODB_URL, {
@@ -27,7 +33,19 @@ mongoose
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedCors.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
+};
+
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
@@ -35,6 +53,7 @@ app.use(requestLogger);
 
 app.post('/signup', celebrate(signUp), createUser);
 app.post('/signin', celebrate(signIn), login);
+app.get('/logout', logout);
 app.use(auth);
 app.use(router);
 

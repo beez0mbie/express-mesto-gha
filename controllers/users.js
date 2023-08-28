@@ -27,6 +27,14 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const logout = (req, res, next) => {
+  try {
+    res.clearCookie('jwt').send({ message: 'JWT удален' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getUsers = (req, res, next) => UserModel.find({})
   .then((users) => res.send(users))
   .catch(next);
@@ -95,4 +103,5 @@ module.exports = {
   createUser,
   updateUser,
   updateUserAvatar,
+  logout,
 };
