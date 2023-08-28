@@ -12,13 +12,7 @@ const handleErrors = require('./utils/errors');
 const { signUp, signIn } = require('./utils/routerValidations');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT, MONGODB_URL } = require('./env');
-
-const allowedCors = [
-  'localhost:3000',
-  'localhost:3001',
-  'http://localhost:3001',
-];
+const { PORT, MONGODB_URL, allowedCors } = require('./env');
 
 mongoose
   .connect(MONGODB_URL, {

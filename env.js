@@ -8,10 +8,16 @@ const {
   JWT_DEV = 'dev_secret',
 } = process.env;
 
+const allowedCors = [
+  'http://localhost:3001',
+  'mesto.ashmelkov.nomoredomainsicu.ru',
+];
+
 module.exports = {
   PORT,
   MONGODB_URL,
   NODE_ENV,
   JWT_SECRET,
   JWT_DEV,
+  allowedCors,
 };
